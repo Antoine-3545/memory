@@ -73,5 +73,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
           "cd ~/memory && \
            docker-compose pull && \
-           docker-compose down && \
+           docker rm -f memory-2026 || true && \
            docker-compose up -d"
+
