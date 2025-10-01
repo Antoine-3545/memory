@@ -54,5 +54,5 @@ jobs:
       - name: Build Docker image
         run: |
           echo "Construction de l'image Docker..."
-          docker build -t Antoine-3545/memory-2026 .
+          docker build -t antoine3545/memory-2026 .
 
