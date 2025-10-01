@@ -72,3 +72,4 @@ jobs:
          docker rm memory-2026 || true && \
          docker run -d -p 80:80 --name memory-2026 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026"
 
+          #test
