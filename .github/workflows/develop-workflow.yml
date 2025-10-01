@@ -6,12 +6,35 @@ on:
       - develop
 
 jobs:
-  build:
+  test-memory-2026:
+    name: Test JPEG files
     runs-on: self-hosted
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Hello World
-        run: echo "Workflow exécuté sur le runner self-hosted"
+      - name: Verify 'file' command
+        run: |
+          echo "Vérification que 'file' est installé"
+          which file
+          file --version || true
+
+      - name: Test all JPEGs
+        run: |
+          echo "Début de la vérification des fichiers JPEG..."
+          FOUND_CORRUPTED=0
+          for f in $(git ls-files '*.jpg'); do
+            echo "Testing $f"
+            FILE_TYPE=$(file "$f")
+            echo "$FILE_TYPE"
+            if [[ "$FILE_TYPE" != *"JPEG image data"* ]]; then
+              echo "⚠️ichier corrompu détecté : $f"
+              FOUND_CORRUPTED=1
+            fi
+          done
+          if [ $FOUND_CORRUPTED -eq 1 ]; then
+            echo "Au moins un JPEG corrompu a été détecté !"
+            exit 1
+          fi
+
