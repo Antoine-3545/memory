@@ -1,7 +1,7 @@
-FROM nginx:stable
+FROM debian:bullseye
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends file apt-utils \
+    && apt-get install -y nginx file \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/concentration/html
