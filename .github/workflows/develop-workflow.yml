@@ -58,21 +58,20 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026
 
   deploy-memory-2026:
-  name: Deploy Docker container with Compose
-  runs-on: self-hosted
-  needs: push-memory-2026
-  steps:
-    - name: Setup SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    name: Deploy Docker container with Compose
+    runs-on: self-hosted
+    needs: push-memory-2026
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-    - name: Deploy with docker-compose
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-        "cd ~/memory && \
-         docker-compose pull && \
-         docker-compose down && \
-         docker-compose up -d"
-
+      - name: Deploy with docker-compose
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          "cd ~/memory && \
+           docker-compose pull && \
+           docker-compose down && \
+           docker-compose up -d"
