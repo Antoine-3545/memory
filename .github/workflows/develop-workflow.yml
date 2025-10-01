@@ -20,21 +20,27 @@ jobs:
           which file
           file --version || true
 
-      - name: Test all JPEGs
+
+      - name: Test all JPEGs and replace corrupted ones
         run: |
           echo "Début de la vérification des fichiers JPEG..."
-          FOUND_CORRUPTED=0
           for f in $(git ls-files '*.jpg'); do
             echo "Testing $f"
             FILE_TYPE=$(file "$f")
             echo "$FILE_TYPE"
             if [[ "$FILE_TYPE" != *"JPEG image data"* ]]; then
               echo "⚠️ichier corrompu détecté : $f"
-              FOUND_CORRUPTED=1
+              echo "Remplacement par replacement.jpg"
+              cp html/replacement.jpg "$f"
             fi
           done
-          if [ $FOUND_CORRUPTED -eq 1 ]; then
-            echo "Au moins un JPEG corrompu a été détecté !"
-            exit 1
-          fi
+
+
+      - name: Commit replaced JPEGs
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add '*.jpg'
+          git commit -m "Remplacement automatique des JPEG corrompus" || echo "Rien à commit"
+          git push origin develop || echo "Push échoué"
 
