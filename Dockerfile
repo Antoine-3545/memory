@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 # Base Debian complète
 FROM debian:bullseye
+=======
+FROM debian:bullseye
+
+RUN apt-get update \
+    && apt-get install -y nginx file \
+    && rm -rf /var/lib/apt/lists/*
+>>>>>>> origin/develop
 
 # Installer nginx et file
 RUN apt-get update \
@@ -20,4 +28,3 @@ EXPOSE 80
 
 # Lancer nginx en avant-plan
 CMD ["nginx", "-g", "daemon off;"]
-
