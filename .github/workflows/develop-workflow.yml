@@ -1,0 +1,17 @@
+name: Develop CI
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Hello World
+        run: echo "Workflow exécuté sur le runner self-hosted"
