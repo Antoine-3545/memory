@@ -29,7 +29,6 @@ jobs:
           git add '*.jpg'
           git commit -m "Remplacement JPEG corrompus" || echo "Rien à commit"
           git push origin develop || echo "Push échoué"
-
   build-memory-2026:
     name: Build Docker image
     runs-on: self-hosted
@@ -39,7 +38,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 .
-
   push-memory-2026:
     name: Push Docker image
     runs-on: self-hosted
@@ -51,25 +49,3 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026
-
-  deploy-memory-2026:
-  name: Deploy Docker container
-  runs-on: self-hosted
-  needs: push-memory-2026
-
-  steps:
-    - name: Setup SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-
-    - name: Pull and run Docker container on remote
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-        "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 && \
-         docker stop memory-2026 || true && \
-         docker rm memory-2026 || true && \
-         docker run -d -p 80:80 --name memory-2026 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026"
-
-          #test
