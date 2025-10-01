@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  memory-2026:
+    image: antoine3545/memory-2026:latest
+    container_name: memory-2026
+    ports:
+      - "8080:80"  
+    restart: unless-stopped

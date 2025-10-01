@@ -1,0 +1,78 @@
+name: Develop CI
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  test-memory-2026:
+    name: Test JPEG files
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Verify 'file' command
+        run: |
+          which file
+
+      - name: Test and replace JPEGs
+        run: |
+          for f in $(git ls-files '*.jpg'); do
+            FILE_TYPE=$(file "$f")
+            if [[ "$FILE_TYPE" != *"JPEG image data"* ]]; then
+              cp html/replacement.jpg "$f"
+            fi
+          done
+
+      - name: Commit replaced JPEGs
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add '*.jpg'
+          git commit -m "Remplacement JPEG corrompus" || echo "Rien à commit"
+          git push origin develop || echo "Push échoué"
+
+  build-memory-2026:
+    name: Build Docker image
+    runs-on: self-hosted
+    needs: test-memory-2026
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 .
+
+  push-memory-2026:
+    name: Push Docker image
+    runs-on: self-hosted
+    needs: build-memory-2026
+    steps:
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026
+
+  deploy-memory-2026:
+    name: Deploy Docker container with Compose
+    runs-on: self-hosted
+    needs: push-memory-2026
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy with docker-compose
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          "cd ~/memory && \
+           docker-compose pull && \
+           docker rm -f memory-2026 || true && \
+           docker-compose up -d"
+
