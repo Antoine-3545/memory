@@ -74,4 +74,4 @@ jobs:
           "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 && \
            docker stop memory-2026 || true && \
            docker rm memory-2026 || true && \
-           docker run -d -p 80:80 --name memory-2026 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026"
+           docker run -d -p 8080:80 --name memory-2026 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026"
