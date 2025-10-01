@@ -20,7 +20,6 @@ jobs:
           which file
           file --version || true
 
-
       - name: Test all JPEGs and replace corrupted ones
         run: |
           echo "Début de la vérification des fichiers JPEG..."
@@ -29,12 +28,11 @@ jobs:
             FILE_TYPE=$(file "$f")
             echo "$FILE_TYPE"
             if [[ "$FILE_TYPE" != *"JPEG image data"* ]]; then
-              echo "⚠️ichier corrompu détecté : $f"
-              echo "Remplacement par replacement.jpg"
+              echo "⚠️Fichier corrompu détecté : $f"
+              echo "Remplacement par html/replacement.jpg"
               cp html/replacement.jpg "$f"
             fi
           done
-
 
       - name: Commit replaced JPEGs
         run: |
@@ -43,4 +41,18 @@ jobs:
           git add '*.jpg'
           git commit -m "Remplacement automatique des JPEG corrompus" || echo "Rien à commit"
           git push origin develop || echo "Push échoué"
+
+  build-memory-2026:
+    name: Build Docker image
+    runs-on: self-hosted
+    needs: test-memory-2026   
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          echo "Construction de l'image Docker..."
+          docker build -t Antoine-3545/memory-2026 .
 
